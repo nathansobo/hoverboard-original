@@ -1,0 +1,13 @@
+{
+  "name": "hoverboard",
+  "description": "A web-based virtual keyboard for OS X.",
+  "version": "0.0.1",
+  "main": "hoverboard.js",
+  "dependencies": {
+    "coffee-script": "1.4",
+    "event-tap": "git://github.com/nathansobo/event-tap.git",
+    "express": "3.0",
+    "connect-assets": "2.3",
+    "ejs": "0.8.3",
+  }
+}
