@@ -1,7 +1,9 @@
 #= require "jquery"
 #= require "space-pen"
 #= require "keyboard-view"
-#= require "socket" 
 
 $ ->
-  $('body').append(new KeyboardView)
+  socket = new WebSocket "ws://localhost:8080/"
+
+  socket.onopen = ->
+    $('body').append(new KeyboardView({socket: socket}))

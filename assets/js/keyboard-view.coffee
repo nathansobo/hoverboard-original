@@ -1,6 +1,9 @@
 class window.KeyboardView extends View
-  @content: ->
-    @div "I AM A KEYBOARD", click: 'triggerKeyboardEvent'
+  initialize: (params) ->
+    @socket = params.socket
 
   triggerKeyboardEvent: ->
-    $.post '/keydown-event/7'
+    @socket.send JSON.stringify({type: 'keydown', keyCode: '7'})
+
+  @content: (params) ->
+    @textarea "I AM A KEYBOARD", click: 'triggerKeyboardEvent'
