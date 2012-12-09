@@ -1,26 +1,32 @@
+ws = require "ws"
+http = require 'http'
 express = require "express"
 eventTap = require "event-tap"
-app = express()
 
-helperContext = {}
-app.configure ->
-  app.use(express.methodOverride());
-  app.use(express.bodyParser());
-  app.set('view engine', 'ejs');
-  app.use require('connect-assets')({src: __dirname + "/../assets"})
-  app.use(express.static(__dirname + '/../static'));
-  app.use(express.errorHandler({
-    dumpExceptions: true,
-    showStack: true
-  }));
-  app.use(app.router);
+hoverboard = express()
+httpServer = http.createServer hoverboard
 
-app.get '/', (req, res) ->
-  res.render('index')
+hoverboard.configure ->
+  hoverboard.use express.methodOverride()
+  hoverboard.use express.bodyParser()
+  hoverboard.set 'view engine', 'ejs'
+  hoverboard.use require('connect-assets')({src: __dirname + "/../assets"})
+  hoverboard.use express.static(__dirname + '/../static');
+  hoverboard.use express.errorHandler({dumpExceptions: true, showStack: true })
+  hoverboard.use hoverboard.router
 
-app.post '/keydown-event/:keyCode', (req, res) ->
+hoverboard.get '/', (req, res) ->
+  res.render 'index'
+
+hoverboard.post '/keydown-event/:keyCode', (req, res) ->
   {keyCode} = req.params
-  eventTap.postKeyboardEvent(parseInt(keyCode))
+  eventTap.postKeyboardEvent parseInt(keyCode)
   res.end()
 
-exports.start = (port=8080) -> app.listen(8080)
+socketServer = new ws.Server({server: httpServer})
+
+socketServer.on 'connection', (socket) ->
+  socket.on 'message', (message) ->
+    console.log message
+
+exports.start = (port=8080) -> httpServer.listen(8080)
