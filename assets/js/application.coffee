@@ -3,5 +3,4 @@
 #= require "keyboard-view"
 
 $ ->
-  console.log "HELLOOO"
   $('body').append(new KeyboardView)
