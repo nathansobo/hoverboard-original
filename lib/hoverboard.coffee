@@ -19,11 +19,6 @@ appServer.configure ->
 appServer.get '/', (req, res) ->
   res.render 'index'
 
-appServer.post '/keydown-event/:keyCode', (req, res) ->
-  {keyCode} = req.params
-  eventTap.postKeyboardEvent parseInt(keyCode)
-  res.end()
-
 socketServer.on 'connection', (socket) ->
   socket.on 'message', (message) ->
     data = JSON.parse message
