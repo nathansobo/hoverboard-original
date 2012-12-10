@@ -9,5 +9,6 @@
     "express": "3.0",
     "connect-assets": "2.3",
     "ejs": "0.8.3",
+    "ws": "0.4.23"
   }
 }

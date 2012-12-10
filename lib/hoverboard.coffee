@@ -1,26 +1,29 @@
+ws = require "ws"
+http = require 'http'
 express = require "express"
 eventTap = require "event-tap"
-app = express()
 
-helperContext = {}
-app.configure ->
-  app.use(express.methodOverride());
-  app.use(express.bodyParser());
-  app.set('view engine', 'ejs');
-  app.use require('connect-assets')({src: __dirname + "/../assets"})
-  app.use(express.static(__dirname + '/../static'));
-  app.use(express.errorHandler({
-    dumpExceptions: true,
-    showStack: true
-  }));
-  app.use(app.router);
+appServer = express()
+httpServer = http.createServer appServer
+socketServer = new ws.Server({server: httpServer})
 
-app.get '/', (req, res) ->
-  res.render('index')
+appServer.configure ->
+  appServer.use express.methodOverride()
+  appServer.use express.bodyParser()
+  appServer.set 'view engine', 'ejs'
+  appServer.use require('connect-assets')({src: __dirname + "/../assets"})
+  appServer.use express.static(__dirname + '/../static');
+  appServer.use express.errorHandler({dumpExceptions: true, showStack: true })
+  appServer.use appServer.router
 
-app.post '/keydown-event/:keyCode', (req, res) ->
-  {keyCode} = req.params
-  eventTap.postKeyboardEvent(parseInt(keyCode))
-  res.end()
+appServer.get '/', (req, res) ->
+  res.render 'index'
 
-exports.start = (port=8080) -> app.listen(8080)
+socketServer.on 'connection', (socket) ->
+  socket.on 'message', (message) ->
+    data = JSON.parse message
+
+    if data.type == 'keydown'
+      eventTap.postKeyboardEvent parseInt(data.keyCode)
+
+exports.start = (port=8080) -> httpServer.listen(8080)

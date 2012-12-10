@@ -3,5 +3,7 @@
 #= require "keyboard-view"
 
 $ ->
-  console.log "HELLOOO"
-  $('body').append(new KeyboardView)
+  socket = new WebSocket "ws://localhost:8080/"
+
+  socket.onopen = ->
+    $('body').append(new KeyboardView({socket: socket}))
