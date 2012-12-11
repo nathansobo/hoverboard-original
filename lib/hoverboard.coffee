@@ -25,6 +25,6 @@ socketServer.on 'connection', (socket) ->
 
     switch event.type
       when 'keyDown'
-        eventTap.postKeyboardEvent parseInt(data.keyCode)
+        eventTap.postKeyboardEvent parseInt(event.keyCode)
 
 exports.start = (port=8080) -> httpServer.listen(8080)
