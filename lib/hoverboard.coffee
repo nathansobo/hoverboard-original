@@ -21,9 +21,10 @@ appServer.get '/', (req, res) ->
 
 socketServer.on 'connection', (socket) ->
   socket.on 'message', (message) ->
-    data = JSON.parse message
+    event = JSON.parse message
 
-    if data.type == 'keydown'
-      eventTap.postKeyboardEvent parseInt(data.keyCode)
+    switch event.type
+      when 'keyDown'
+        eventTap.postKeyboardEvent parseInt(data.keyCode)
 
 exports.start = (port=8080) -> httpServer.listen(8080)

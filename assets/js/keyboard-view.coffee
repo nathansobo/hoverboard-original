@@ -3,7 +3,7 @@ class window.KeyboardView extends View
     @socket = params.socket
 
   triggerKeyboardEvent: ->
-    @socket.send JSON.stringify({type: 'keydown', keyCode: '7'})
+    @socket.send JSON.stringify({type: 'keyDown', keyCode: '7'})
 
   @content: (params) ->
     @div "I AM A KEYBOARD", click: 'triggerKeyboardEvent'
