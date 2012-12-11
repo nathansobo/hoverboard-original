@@ -4,5 +4,6 @@ class window.KeyboardView extends View
 
   triggerKeyboardEvent: ->
     @socket.send JSON.stringify({type: 'keydown', keyCode: '7'})
+
   @content: (params) ->
-    @textarea "I AM A KEYBOARD", click: 'triggerKeyboardEvent'
+    @div "I AM A KEYBOARD", click: 'triggerKeyboardEvent'
