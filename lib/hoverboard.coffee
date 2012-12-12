@@ -26,5 +26,11 @@ socketServer.on 'connection', (socket) ->
     switch event.type
       when 'keyDown'
         eventTap.postKeyboardEvent parseInt(event.keyCode)
+      when 'mouseMove'
+        coordinates = eventTap.getMouseLocation()
+        x = coordinates.x + event.x
+        y = coordinates.y + event.y
+
+        eventTap.postMouseEvent x, y
 
 exports.start = (port=8080) -> httpServer.listen(8080)
