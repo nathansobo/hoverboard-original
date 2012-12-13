@@ -37,7 +37,7 @@ Handle<Value> PostMouseEvent(const Arguments& args) {
   point.x = args[0]->NumberValue();
   point.y = args[1]->NumberValue();
 
-  CGEventRef event = CGEventCreateMouseEvent(NULL, kCGEventLeftMouseDown, point, kCGMouseButtonLeft);
+  CGEventRef event = CGEventCreateMouseEvent(NULL, kCGEventMouseMoved, point, NULL);
   CGEventPost(kCGHIDEventTap, event);
 
   CFRelease(event);
