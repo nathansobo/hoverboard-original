@@ -5,6 +5,7 @@
   "main": "hoverboard.js",
   "dependencies": {
     "coffee-script": "1.4",
+    "stylus": "0.31.0",
     "event-tap": "git://github.com/nathansobo/event-tap.git",
     "express": "3.0",
     "connect-assets": "2.3",

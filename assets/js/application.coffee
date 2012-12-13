@@ -3,7 +3,4 @@
 #= require "keyboard-view"
 
 $ ->
-  socket = new WebSocket "ws://#{location.host}/"
-
-  socket.onopen = ->
-    $('body').append(new KeyboardView({socket: socket}))
+  $('body').append(new KeyboardView)
