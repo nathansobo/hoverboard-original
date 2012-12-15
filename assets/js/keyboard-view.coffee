@@ -10,6 +10,8 @@ class window.KeyboardView
       document.addEventListener "touchend", @touchEnd, false
 
   touchStart: (event) =>
+    event.preventDefault()
+
     touch = event.targetTouches[event.targetTouches.length - 1]
 
     @touches[touch.identifier] = { x: touch.pageX, y: touch.pageY }
@@ -18,9 +20,9 @@ class window.KeyboardView
       @lastMouseX = event.targetTouches[0].pageX
       @lastMouseY = event.targetTouches[0].pageY
 
+  touchMove: (event) =>
     event.preventDefault()
 
-  touchMove: (event) =>
     if event.targetTouches.length == 2
       mouseX = event.targetTouches[0].pageX
       mouseY = event.targetTouches[0].pageY
@@ -32,13 +34,11 @@ class window.KeyboardView
 
       @socket.send JSON.stringify({type: 'mouseMove', x: deltaMouseX, y: deltaMouseY })
 
+  touchEnd: (event) =>
     event.preventDefault()
 
-  touchEnd: (event) =>
     for touch in event.changedTouches
       delete @touches[touch.identifier]
-
-    event.preventDefault()
 
   triggerKeyboardEvent: =>
     @socket.send JSON.stringify({type: 'keyDown', keyCode: '7'})
