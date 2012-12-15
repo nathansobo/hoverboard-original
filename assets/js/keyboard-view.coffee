@@ -13,7 +13,7 @@ class window.KeyboardView
 
     touch = event.targetTouches[event.targetTouches.length - 1]
 
-    @touches[touch.identifier] = { x: touch.pageX, y: touch.pageY }
+    @touches[touch.identifier] = touch
 
     if event.targetTouches.length == 2
       @lastMouseX = event.targetTouches[0].pageX
