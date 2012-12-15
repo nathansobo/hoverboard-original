@@ -16,8 +16,10 @@ class window.KeyboardView
     @touches[touch.identifier] = touch
 
     if event.targetTouches.length == 2
-      @lastMouseX = event.targetTouches[0].pageX
-      @lastMouseY = event.targetTouches[0].pageY
+      firstTouch = event.targetTouches[0]
+
+      @lastMouseX = firstTouch.pageX
+      @lastMouseY = firstTouch.pageY
 
   touchMove: (event) =>
     event.preventDefault()
