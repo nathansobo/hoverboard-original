@@ -1,6 +1,7 @@
 class window.KeyboardView
   constructor: ->
     @touches = {}
+    @mouseSensitivity = 8 #TODO: Make configurable
     @socket = new WebSocket "ws://#{location.host}/"
 
     @socket.onopen = =>
@@ -20,6 +21,7 @@ class window.KeyboardView
 
       @lastMouseX = firstTouch.pageX
       @lastMouseY = firstTouch.pageY
+      @lastMouseTime = new Date().getTime()
 
   touchMove: (event) =>
     event.preventDefault()
@@ -27,13 +29,22 @@ class window.KeyboardView
     if event.targetTouches.length == 2
       mouseX = event.targetTouches[0].pageX
       mouseY = event.targetTouches[0].pageY
-      deltaMouseX = mouseX - @lastMouseX
-      deltaMouseY = mouseY - @lastMouseY
+      mouseTime = new Date().getTime()
+      mouseXDelta = mouseX - @lastMouseX
+      mouseYDelta = mouseY - @lastMouseY
+      mouseTimeDelta = mouseTime - @lastMouseTime
+      pixelDistance = Math.sqrt((mouseXDelta * mouseXDelta) + (mouseYDelta * mouseYDelta))
+      mouseVelocity = pixelDistance / mouseTimeDelta
+      mouseSpeed = mouseVelocity * @mouseSensitivity
+      translateMouseX = mouseXDelta * mouseSpeed
+      translateMouseY = mouseYDelta * mouseSpeed
+      message = { type: 'mouseMove', x: translateMouseX, y: translateMouseY }
 
       @lastMouseX = mouseX
       @lastMouseY = mouseY
+      @lastMouseTime = mouseTime
 
-      @socket.send JSON.stringify({type: 'mouseMove', x: deltaMouseX, y: deltaMouseY })
+      @socket.send JSON.stringify(message)
 
   touchEnd: (event) =>
     event.preventDefault()
