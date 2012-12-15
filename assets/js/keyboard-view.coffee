@@ -1,10 +1,9 @@
 class window.KeyboardView
   constructor: ->
+    @touches = {}
     @socket = new WebSocket "ws://#{location.host}/"
 
     @socket.onopen = =>
-      @touches = {}
-
       document.addEventListener "touchstart", @touchStart, false
       document.addEventListener "touchmove", @touchMove, false
       document.addEventListener "touchend", @touchEnd, false
