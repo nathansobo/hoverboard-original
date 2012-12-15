@@ -22,18 +22,15 @@ class window.KeyboardView
 
   touchMove: (event) =>
     if event.targetTouches.length == 2
-      currentMouseX = event.targetTouches[0].pageX
-      currentMouseY = event.targetTouches[0].pageY
-      distanceFromLastMouseX = currentMouseX - @lastMouseX
-      distanceFromLastMouseY = currentMouseY - @lastMouseY
+      mouseX = event.targetTouches[0].pageX
+      mouseY = event.targetTouches[0].pageY
+      deltaMouseX = mouseX - @lastMouseX
+      deltaMouseY = mouseY - @lastMouseY
 
-      console.log @lastMouseX
-      console.log @lastMouseY
+      @lastMouseX = mouseX
+      @lastMouseY = mouseY
 
-      @lastMouseX = currentMouseX
-      @lastMouseY = currentMouseY
-
-      @socket.send JSON.stringify({type: 'mouseMove', x: distanceFromLastMouseX, y: distanceFromLastMouseY })
+      @socket.send JSON.stringify({type: 'mouseMove', x: deltaMouseX, y: deltaMouseY })
 
     event.preventDefault()
 
