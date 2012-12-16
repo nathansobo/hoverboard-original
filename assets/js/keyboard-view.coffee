@@ -1,7 +1,7 @@
 class window.KeyboardView
   constructor: ->
     @touches = {}
-    @mouseSensitivity = 8 #TODO: Make configurable
+    @mouseSensitivity = 15 #TODO: Make configurable
     @socket = new WebSocket "ws://#{location.host}/"
 
     @socket.onopen = =>
