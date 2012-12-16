@@ -1,47 +1,56 @@
 class window.KeyboardView
   constructor: ->
+    @touches = {}
+    @mouseSensitivity = 15 #TODO: Make configurable
     @socket = new WebSocket "ws://#{location.host}/"
 
     @socket.onopen = =>
-      @touches = {}
-
       document.addEventListener "touchstart", @touchStart, false
       document.addEventListener "touchmove", @touchMove, false
       document.addEventListener "touchend", @touchEnd, false
 
   touchStart: (event) =>
+    event.preventDefault()
+
     touch = event.targetTouches[event.targetTouches.length - 1]
 
-    @touches[touch.identifier] = { x: touch.pageX, y: touch.pageY }
+    @touches[touch.identifier] = touch
 
     if event.targetTouches.length == 2
-      @lastMouseX = event.targetTouches[0].pageX
-      @lastMouseY = event.targetTouches[0].pageY
+      firstTouch = event.targetTouches[0]
 
-    event.preventDefault()
+      @lastMouseX = firstTouch.pageX
+      @lastMouseY = firstTouch.pageY
+      @lastMouseTime = new Date().getTime()
 
   touchMove: (event) =>
-    if event.targetTouches.length == 2
-      currentMouseX = event.targetTouches[0].pageX
-      currentMouseY = event.targetTouches[0].pageY
-      distanceFromLastMouseX = currentMouseX - @lastMouseX
-      distanceFromLastMouseY = currentMouseY - @lastMouseY
-
-      console.log @lastMouseX
-      console.log @lastMouseY
-
-      @lastMouseX = currentMouseX
-      @lastMouseY = currentMouseY
-
-      @socket.send JSON.stringify({type: 'mouseMove', x: distanceFromLastMouseX, y: distanceFromLastMouseY })
-
     event.preventDefault()
+
+    if event.targetTouches.length == 2
+      mouseX = event.targetTouches[0].pageX
+      mouseY = event.targetTouches[0].pageY
+      mouseTime = new Date().getTime()
+      mouseXDelta = mouseX - @lastMouseX
+      mouseYDelta = mouseY - @lastMouseY
+      mouseTimeDelta = mouseTime - @lastMouseTime
+      pixelDistance = Math.sqrt((mouseXDelta * mouseXDelta) + (mouseYDelta * mouseYDelta))
+      mouseVelocity = pixelDistance / mouseTimeDelta
+      mouseSpeed = mouseVelocity * @mouseSensitivity
+      translateMouseX = mouseXDelta * mouseSpeed
+      translateMouseY = mouseYDelta * mouseSpeed
+      message = { type: 'mouseMove', x: translateMouseX, y: translateMouseY }
+
+      @lastMouseX = mouseX
+      @lastMouseY = mouseY
+      @lastMouseTime = mouseTime
+
+      @socket.send JSON.stringify(message)
 
   touchEnd: (event) =>
+    event.preventDefault()
+
     for touch in event.changedTouches
       delete @touches[touch.identifier]
-
-    event.preventDefault()
 
   triggerKeyboardEvent: =>
     @socket.send JSON.stringify({type: 'keyDown', keyCode: '7'})
