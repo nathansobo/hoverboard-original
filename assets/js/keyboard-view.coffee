@@ -12,9 +12,7 @@ class window.KeyboardView
   touchStart: (event) =>
     event.preventDefault()
 
-    touch = event.targetTouches[event.targetTouches.length - 1]
-
-    @touches[touch.identifier] = touch
+    currentTouch = event.targetTouches[event.targetTouches.length - 1]
 
     if event.targetTouches.length > 1
       firstTouch = event.targetTouches[0]
@@ -22,6 +20,14 @@ class window.KeyboardView
       @lastMouseX = firstTouch.pageX
       @lastMouseY = firstTouch.pageY
       @lastMouseTime = new Date().getTime()
+
+      if event.targetTouches.length == 3
+        button = if currentTouch.pageX > firstTouch.pageX then 'right' else 'left'
+        message = { type: "#{button}MouseDown", x: 0, y: 0 }
+
+        @lastMouseButton = button
+
+        @socket.send JSON.stringify(message)
 
   touchMove: (event) =>
     event.preventDefault()
@@ -38,7 +44,7 @@ class window.KeyboardView
       mouseSpeed = mouseVelocity * @mouseSensitivity
       translateMouseX = mouseXDelta * mouseSpeed
       translateMouseY = mouseYDelta * mouseSpeed
-      message = { type: 'mouseMove', x: translateMouseX, y: translateMouseY }
+      message = { type: 'mouseMoved', x: translateMouseX, y: translateMouseY }
 
       @lastMouseX = mouseX
       @lastMouseY = mouseY
@@ -49,8 +55,10 @@ class window.KeyboardView
   touchEnd: (event) =>
     event.preventDefault()
 
-    for touch in event.changedTouches
-      delete @touches[touch.identifier]
+    if event.targetTouches.length == 2
+      message = { type: "#{@lastMouseButton}MouseUp", x: 0, y: 0 }
+
+      @socket.send JSON.stringify(message)
 
   triggerKeyboardEvent: =>
     @socket.send JSON.stringify({type: 'keyDown', keyCode: '7'})
