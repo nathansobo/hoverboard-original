@@ -44,7 +44,10 @@ class window.KeyboardView
       mouseSpeed = mouseVelocity * @mouseSensitivity
       translateMouseX = mouseXDelta * mouseSpeed
       translateMouseY = mouseYDelta * mouseSpeed
-      message = { type: 'mouseMoved', x: translateMouseX, y: translateMouseY }
+      message = {}
+      message.type = if @lastMouseButton then "#{@lastMouseButton}MouseDragged" else 'mouseMoved'
+      message.x = translateMouseX
+      message.y = translateMouseY
 
       @lastMouseX = mouseX
       @lastMouseY = mouseY
@@ -57,6 +60,8 @@ class window.KeyboardView
 
     if event.targetTouches.length == 2
       message = { type: "#{@lastMouseButton}MouseUp", x: 0, y: 0 }
+
+      @lastMouseButton = null
 
       @socket.send JSON.stringify(message)
 

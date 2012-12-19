@@ -27,7 +27,7 @@ socketServer.on 'connection', (socket) ->
     switch event.type
       when 'keyDown'
         eventTap.postKeyboardEvent parseInt(event.keyCode)
-      when 'mouseMoved', 'leftMouseDown', 'leftMouseUp', 'rightMouseDown', 'rightMouseUp'
+      when 'mouseMoved', 'leftMouseDown', 'leftMouseUp', 'rightMouseDown', 'rightMouseUp', 'leftMouseDragged', 'rightMouseDragged'
         currentMouseLocation = eventTap.getMouseLocation()
         x = currentMouseLocation.x + event.x
         y = currentMouseLocation.y + event.y
