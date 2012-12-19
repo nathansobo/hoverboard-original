@@ -30,7 +30,10 @@ socketServer.on 'connection', (socket) ->
       when 'mouseMove'
         { x, y } = event
         currentMouseLocation = eventTap.getMouseLocation()
-        eventTap.postMouseEvent \
-          currentMouseLocation.x + x, currentMouseLocation.y + y
+        eventTap.postMouseEvent(
+          "mouseMoved",
+          currentMouseLocation.x + x,
+          currentMouseLocation.y + y
+        )
 
 exports.start = (port=8080) -> httpServer.listen(8080)
