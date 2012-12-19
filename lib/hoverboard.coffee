@@ -20,7 +20,6 @@ appServer.get '/', (req, res) ->
   res.render 'index'
 
 socketServer.on 'connection', (socket) ->
-  currentMouseLocation = eventTap.getMouseLocation()
 
   socket.on 'message', (message) ->
     event = JSON.parse message
@@ -29,7 +28,9 @@ socketServer.on 'connection', (socket) ->
       when 'keyDown'
         eventTap.postKeyboardEvent parseInt(event.keyCode)
       when 'mouseMove'
+        { x, y } = event
+        currentMouseLocation = eventTap.getMouseLocation()
         eventTap.postMouseEvent \
-          currentMouseLocation.x += event.x, currentMouseLocation.y += event.y
+          currentMouseLocation.x + x, currentMouseLocation.y + y
 
 exports.start = (port=8080) -> httpServer.listen(8080)
