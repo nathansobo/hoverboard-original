@@ -3,6 +3,7 @@ class window.KeyboardView
     @touches = {}
     @mouseSensitivity = 15 #TODO: Make configurable
     @socket = new WebSocket "ws://#{location.host}/"
+    @doubleClickTimeMilliseconds = 420
 
     @socket.onopen = =>
       document.addEventListener "touchstart", @touchStart, false
@@ -12,21 +13,32 @@ class window.KeyboardView
   touchStart: (event) =>
     event.preventDefault()
 
-    touch = event.targetTouches[event.targetTouches.length - 1]
+    currentTouch = event.targetTouches[event.targetTouches.length - 1]
 
-    @touches[touch.identifier] = touch
-
-    if event.targetTouches.length == 2
+    if event.targetTouches.length > 1
       firstTouch = event.targetTouches[0]
 
       @lastMouseX = firstTouch.pageX
       @lastMouseY = firstTouch.pageY
       @lastMouseTime = new Date().getTime()
 
+      if event.targetTouches.length == 3
+        button = if currentTouch.pageX > firstTouch.pageX then 'right' else 'left'
+        message = { type: "#{button}MouseDown", x: 0, y: 0 }
+        timeBetweenMouseDowns = new Date().getTime() - @lastMouseDownTime
+
+        if timeBetweenMouseDowns <= @doubleClickTimeMilliseconds
+          console.log 'double clicked'
+
+        @lastMouseButton = button
+        @lastMouseDownTime = new Date().getTime()
+
+        @socket.send JSON.stringify(message)
+
   touchMove: (event) =>
     event.preventDefault()
 
-    if event.targetTouches.length == 2
+    if event.targetTouches.length > 1
       mouseX = event.targetTouches[0].pageX
       mouseY = event.targetTouches[0].pageY
       mouseTime = new Date().getTime()
@@ -38,7 +50,10 @@ class window.KeyboardView
       mouseSpeed = mouseVelocity * @mouseSensitivity
       translateMouseX = mouseXDelta * mouseSpeed
       translateMouseY = mouseYDelta * mouseSpeed
-      message = { type: 'mouseMove', x: translateMouseX, y: translateMouseY }
+      message = {}
+      message.type = if @lastMouseButton then "#{@lastMouseButton}MouseDragged" else 'mouseMoved'
+      message.x = translateMouseX
+      message.y = translateMouseY
 
       @lastMouseX = mouseX
       @lastMouseY = mouseY
@@ -49,8 +64,12 @@ class window.KeyboardView
   touchEnd: (event) =>
     event.preventDefault()
 
-    for touch in event.changedTouches
-      delete @touches[touch.identifier]
+    if event.targetTouches.length == 2
+      message = { type: "#{@lastMouseButton}MouseUp", x: 0, y: 0 }
+
+      @lastMouseButton = null
+
+      @socket.send JSON.stringify(message)
 
   triggerKeyboardEvent: =>
     @socket.send JSON.stringify({type: 'keyDown', keyCode: '7'})
