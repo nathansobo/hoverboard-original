@@ -3,6 +3,7 @@ class window.KeyboardView
     @touches = {}
     @mouseSensitivity = 15 #TODO: Make configurable
     @socket = new WebSocket "ws://#{location.host}/"
+    @doubleClickTimeMilliseconds = 420
 
     @socket.onopen = =>
       document.addEventListener "touchstart", @touchStart, false
@@ -24,8 +25,13 @@ class window.KeyboardView
       if event.targetTouches.length == 3
         button = if currentTouch.pageX > firstTouch.pageX then 'right' else 'left'
         message = { type: "#{button}MouseDown", x: 0, y: 0 }
+        timeBetweenMouseDowns = new Date().getTime() - @lastMouseDownTime
+
+        if timeBetweenMouseDowns <= @doubleClickTimeMilliseconds
+          console.log 'double clicked'
 
         @lastMouseButton = button
+        @lastMouseDownTime = new Date().getTime()
 
         @socket.send JSON.stringify(message)
 
